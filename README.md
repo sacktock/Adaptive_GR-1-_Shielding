@@ -12,7 +12,7 @@ and
 ```
 python run_all_seaquest.py
 ```
-Individual runs can be lauched via the python scripts: ```run_minepump.py``` or ```run_seaquest.py```. Differnt shield implementations can be run via the command line arguments, for exmaple,
+Individual runs can be lauched via the python scripts: ```run_minepump.py``` or ```run_seaquest.py```. Different shield implementations can be run via the command line arguments, for exmaple,
 ```
 python run_minepump.py --shield adaptive
 ```
@@ -178,14 +178,3 @@ To test the adaptive shield repair, please run,
 python -m shield.adaptive_controller_shield
 ```
 you should not see any error output if the installation was successful.
-
-# Reproducing our results
-
-You can directly reproduce our results by running either,
-```
-python run_all_minepump.py
-```
-or,
-```
-python run_all_seaquest.py
-```
