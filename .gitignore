@@ -1,0 +1,16 @@
+.ipynb_checkpoints/
+__pycache__/
+logdir/
+nohup*
+data/
+images/
+*/__pycache__/
+slurm*
+tmp/
+*.ipynb
+videos/
+*_tensorboard/
+annex*
+spec_repair.log
+logs/
+logdir0/

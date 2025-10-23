@@ -1,0 +1,162 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Background Knowledge
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% ---*** Domain independent Axioms ***---
+
+% Time Relations Definitions
+after(T2,T1,S):- % Base Case
+    next(T2,T1,S).
+
+after(T3,T1,S):- % Recursive Step
+    next(T2,T1,S),
+    after(T3,T2,S).
+
+prev(T1,T2,S):-
+    next(T2,T1,S).
+
+% Temporal Operator Definitions
+temporal_operator(current).
+temporal_operator(next).
+temporal_operator(prev).
+temporal_operator(eventually).
+
+% Timepoint of operation definitions
+
+timepoint_of_op(current,T1,T1,S) :-
+    trace(S),
+    timepoint(T1,S),
+    not weak_timepoint(T1,S).
+
+timepoint_of_op(next,T1,T2,S) :-
+    trace(S),
+    timepoint(T1,S),
+    not weak_timepoint(T1,S),
+    timepoint(T2,S),
+    next(T2,T1,S).
+
+timepoint_of_op(prev,T1,T2,S) :-
+    trace(S),
+    timepoint(T1,S),
+    timepoint(T2,S),
+    not weak_timepoint(T1,S),
+    not weak_timepoint(T2,S),
+    prev(T2,T1,S).
+
+timepoint_of_op(eventually,T1,T1,S) :-
+    trace(S),
+    timepoint(T1,S),
+    not weak_timepoint(T1,S).
+
+timepoint_of_op(eventually,T1,T2,S) :-
+    trace(S),
+    timepoint(T1,S),
+    not weak_timepoint(T1,S),
+    timepoint(T2,S),
+    after(T2,T1,S).
+
+% Weak Timepoint Definitions
+
+weak_timepoint_atom(weak_t).
+
+next_timepoint_exists(T1,S):-
+    timepoint(T1,S),
+    timepoint(T2,S),
+    not weak_timepoint(T2,S),
+    next(T2,T1,S).
+
+weak_timepoint(X,S):-
+    weak_timepoint_atom(X),
+    timepoint(T,S),
+    not next_timepoint_exists(T,S).
+
+timepoint(T,S):-
+    trace(S),
+    weak_timepoint(T,S).
+
+next(X,T,S):-
+    weak_timepoint(X,S),
+    timepoint(T,S),
+    not weak_timepoint(T,S),
+    not next_timepoint_exists(T,S).
+
+holds_at(A,T,S):-
+    atom(A),
+    weak_timepoint(T,S),
+    trace(S).
+
+not_holds_at(A,T,S):-
+    atom(A),
+    weak_timepoint(T,S),
+    trace(S).
+
+root_consequent_holds(OP,E,T,S):-
+    root_consequent_holds(OP,E,I,T,S).
+
+% GR(1) Rules
+
+:- 	contradiction_holds(A,T,S).
+
+contradiction_holds(A,T,S) :-
+    atom(A),
+	trace(S),
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+    not_holds_at(A,T,S),
+    holds_at(A,T,S).
+
+holds_non_vacuously(E, T, S):-
+	exp(E),
+	trace(S),
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	antecedent_holds(E, T, S),
+	consequent_holds(E, T, S).
+
+holds_vacuously(E, T, S):-
+	exp(E),
+	trace(S),
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	not antecedent_holds(E, T, S).
+
+holds(G, T, S):-
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	trace(S),
+	exp(G),
+	holds_non_vacuously(G, T, S).
+
+holds(G, T, S):-
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	trace(S),
+	exp(G),
+	holds_vacuously(G, T, S).
+
+violation_holds(G,T,S):-
+	exp(G),
+	trace(S),
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	not holds(G,T,S).
+
+violated(S):-
+	exp(G),
+	trace(S),
+	timepoint(T,S),
+	not weak_timepoint(T,S),
+	violation_holds(G,T,S).
+
+entailed(S):-
+	trace(S),
+	not violated(S).
+
+exp(E):-
+	guarantee(E).
+
+exp(E):-
+	assumption(E).
+
+% ---*** Domain dependent Axioms ***---
+

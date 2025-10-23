@@ -1,0 +1,9 @@
+    if not c_egs:
+      solution_count+=1
+      debug_print(f'Solution {solution_count} (score {solve_result["expected_score"]})')
+      print(ilasp.hypothesis_to_string(solve_result['hypothesis']))
+      new_constraint_body = map(lambda x: f'nge_HYP({x})', solve_result["hypothesis"])
+      # if you want to rule allow non-subset-minimal solutions uncomment this line and comment the one below.
+      # new_constraint = f':- {",".join(new_constraint_body)}, #count' + "{ H : nge_HYP(H) }" + f' = {len(solve_result["hypothesis"])}.\\n'
+      new_constraint = f':- {",".join(new_constraint_body)}.\\n'
+      ilasp.cdilp.add_to_meta_program(new_constraint)
