@@ -26,7 +26,7 @@ SETUP_DICT = {'wsl': False,
 USER_PATH = 'path_to_user'
 
 # TODO - update this to your project path
-PROJECT_PATH: str = os.path.expanduser("patj_to_project")
+PROJECT_PATH: str = os.path.expanduser("path_to_project")
 GENERATE_MULTIPLE_TRACES = False
 
 # Violation Listening Configurations
