@@ -70,7 +70,7 @@ class OxygenWrapper(gym.Wrapper):
         if not ((self.oxygen_level > 0) or (self.depth == 0)):
             terminated = True
 
-        if (self._switching_flag) and (self.oxygen_level <= self.switching_oxygen_level) and (self.oxygen_depletion_rate != self.higher_depletion_rate):
+        if (self._switching_flag) and (self.oxygen_level <= self.switching_oxygen_level) and (self.depth > 0) and (self.oxygen_depletion_rate != self.higher_depletion_rate):
             self.oxygen_depletion_rate = self.higher_depletion_rate
 
         return obs, reward, terminated, truncated, info
@@ -226,7 +226,7 @@ class Seaquest(gym.Env):
         oxygen_level = int(info['_oxygen_level'])
         t = self._t
 
-        print(f"depth={curr_depth}, oxygen_level={oxygen_level}, down={down}, operational={operational}")
+        #print(f"depth={curr_depth}, oxygen_level={oxygen_level}, down={down}, operational={operational}")
 
         if not operational and (up or down):
             self._action = self._act_dict[self._action]

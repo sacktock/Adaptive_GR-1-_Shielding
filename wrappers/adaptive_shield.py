@@ -14,7 +14,7 @@ class AdaptiveShieldWrapper(gym.Wrapper):
         self._env_varibs = None
 
     def _init_shield(self, state=None):
-        self.shield = AdaptiveShield(self.path_to_spec, initiate_spec_repair=False)
+        self.shield = AdaptiveShield(self.path_to_spec, initiate_spec_repair=True)
         self.shield.initiate_starting_state(state)
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):

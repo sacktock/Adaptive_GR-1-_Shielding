@@ -57,7 +57,7 @@ def act_abstr(outputs, varibs, action):
         return 5
     return action 
 
-def make_env(seed=0, max_steps=24000, clip_reward=True, shield_impl="none"):
+def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
     """
     Seaquest (expected) -> ShieldWrapper -> Monitor -> (optional) ClipReward
     """
@@ -73,8 +73,7 @@ def make_env(seed=0, max_steps=24000, clip_reward=True, shield_impl="none"):
             unexpected_violation=False,
             max_episode_steps=max_steps,
         )
-        if shield_impl == "adaptive":
-            #env = Adaptive_Shield(env)
+        if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
                 PATH_TO_SPEC,
@@ -88,6 +87,8 @@ def make_env(seed=0, max_steps=24000, clip_reward=True, shield_impl="none"):
             env = ShieldWrapper(env, Static_Shield())
         if shield_impl == "repaired":
             env = ShieldWrapper(env, Repaired_Shield())
+        if shield_impl == "adaptive-python":
+            env = ShieldWrapper(env, Adaptive_Shield())
         env = Monitor(env, info_keywords=("is_success",))
         if clip_reward:
             env = ClipRewardWrapper(env)
@@ -95,7 +96,7 @@ def make_env(seed=0, max_steps=24000, clip_reward=True, shield_impl="none"):
         return env
     return _init
 
-def make_eval_env(seed=0, max_steps=24000, shield_impl="none"):
+def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
     """
     Seaquest (unexpected) -> ShieldWrapper
     """
@@ -111,7 +112,7 @@ def make_eval_env(seed=0, max_steps=24000, shield_impl="none"):
             unexpected_violation=True,
             max_episode_steps=max_steps,
         )
-        if shield_impl == "adaptive":
+        if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
                 PATH_TO_SPEC,
@@ -125,6 +126,8 @@ def make_eval_env(seed=0, max_steps=24000, shield_impl="none"):
             env = ShieldWrapper(env, Static_Shield())
         if shield_impl == "repaired":
             env = ShieldWrapper(env, Repaired_Shield())
+        if shield_impl == "adaptive-python":
+            env = ShieldWrapper(env, Adaptive_Shield())
         env.reset(seed=seed)
         return env
     return _init
@@ -205,7 +208,7 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--eval", type=int, default=20)
     parser.add_argument("--logdir", type=str, default="./logdir/seaquest")
     parser.add_argument("--tensorboard", action="store_true", default=False)
-    parser.add_argument("--shield", type=str, choices=["none", "naive", "static", "repaired", "adaptive"], default="adaptive")
+    parser.add_argument("--shield", type=str, choices=["none", "naive", "static", "repaired", "adaptive-python", "adaptive-ilasp"], default="adaptive-python")
     args = parser.parse_args()
 
     runs = args.runs
