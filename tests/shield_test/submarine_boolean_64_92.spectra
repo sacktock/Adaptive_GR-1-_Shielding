@@ -6,6 +6,8 @@ sys boolean rescues1;
 sys boolean rescues2;
 sys boolean rescues3;
 sys boolean rescues4;
+env boolean operational;
+env boolean reset_flag;
 env boolean diver_at_depth1;
 env boolean diver_at_depth2;
 env boolean diver_at_depth3;
@@ -24,9 +26,11 @@ env boolean depth3;
 env boolean depth4;
 
 assumption -- surface_start
-	ini diver_at_depth1=false & diver_at_depth2=false & diver_at_depth3=false & diver_at_depth4=false oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false;
+	ini operational=false & reset_flag=true & diver_at_depth1=false & diver_at_depth2=false & diver_at_depth3=false & diver_at_depth4=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false;
+assumption -- oxygen_does_not_increase_at_surface_after_reset
+	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & reset_flag=true -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
 assumption -- oxygen_increases_at_surface_from_0_to_1
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & reset_flag=false -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
 assumption -- oxygen_increases_at_surface_from_1_to_2
 	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
 assumption -- oxygen_increases_at_surface_from_2_to_3
@@ -154,9 +158,9 @@ assumption -- oxygen_increases_at_surface_from_62_to_63
 assumption -- oxygen_increases_at_surface_from_63_to_64
 	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true));
 assumption -- max_oxygen_at_surface_stays_max
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true));
-assumption -- oxygen_decreases_at_depth_from_64_to_63
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & down=false -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true));
+assumption -- oxygen_decreases_from_64_to_63_on_down
+	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & down=true -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
 assumption -- oxygen_decreases_at_depth_from_63_to_62
 	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
 assumption -- oxygen_decreases_at_depth_from_62_to_61
@@ -434,8 +438,6 @@ assumption -- not_moving_keeps_depth_at_22
 	alw(depth0=false & depth1=true & depth2=true & depth3=false & depth4=true & up=false & down=false -> next(depth0=false & depth1=true & depth2=true & depth3=false & depth4=true));
 assumption -- not_moving_keeps_depth_at_23
 	alw(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true & up=false & down=false -> next(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true));
-assumption -- not_moving_keeps_depth_at_24
-	alw(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true & up=false & down=false -> next(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true));
 
 assumption -- alwEv_divers_at_depth_1
 	alwEv(diver_at_depth1=true);
@@ -447,28 +449,36 @@ assumption -- alwEv_divers_at_depth_4
 	alwEv(diver_at_depth4=true);
 
 assumption -- diver_gets_rescued_if_submarine_depth_1
-	alw(depth0=false & depth1=true & depth2=true & depth3=false & depth4=false->next(diver_at_depth1=false));
+	alw(diver_at_depth1=true & depth0=true & depth1=false & depth2=true & depth3=false & depth4=false->next(diver_at_depth1=false));
 assumption -- diver_gets_rescued_if_submarine_depth_2
-	alw(depth0=false & depth1=false & depth2=true & depth3=true & depth4=false->next(diver_at_depth2=false));
+	alw(diver_at_depth2=true & depth0=true & depth1=true & depth2=false & depth3=true & depth4=false->next(diver_at_depth2=false));
 assumption -- diver_gets_rescued_if_submarine_depth_3
-	alw(depth0=false & depth1=true & depth2=false & depth3=false & depth4=true->next(diver_at_depth3=false));
+	alw(diver_at_depth3=true & depth0=true & depth1=false & depth2=false & depth3=false & depth4=true->next(diver_at_depth3=false));
 assumption -- diver_gets_rescued_if_submarine_depth_4
-	alw(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true->next(diver_at_depth4=false));
+	alw(diver_at_depth4=true & depth0=true & depth1=true & depth2=true & depth3=false & depth4=true->next(diver_at_depth4=false));
 
 assumption -- persistent_diver_at_depth_1
-	alw(diver_at_depth1=true & !(depth0=false & depth1=true & depth2=true & depth3=false & depth4=false)->next(diver_at_depth1=true));
+	alw(diver_at_depth1=true & !(depth0=true & depth1=false & depth2=true & depth3=false & depth4=false)->next(diver_at_depth1=true));
 assumption -- persistent_diver_at_depth_2
-	alw(diver_at_depth2=true & !(depth0=false & depth1=false & depth2=true & depth3=true & depth4=false)->next(diver_at_depth2=true));
+	alw(diver_at_depth2=true & !(depth0=true & depth1=true & depth2=false & depth3=true & depth4=false)->next(diver_at_depth2=true));
 assumption -- persistent_diver_at_depth_3
-	alw(diver_at_depth3=true & !(depth0=false & depth1=true & depth2=false & depth3=false & depth4=true)->next(diver_at_depth3=true));
+	alw(diver_at_depth3=true & !(depth0=true & depth1=false & depth2=false & depth3=false & depth4=true)->next(diver_at_depth3=true));
 assumption -- persistent_diver_at_depth_4
-	alw(diver_at_depth4=true & !(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true)->next(diver_at_depth4=true));
+	alw(diver_at_depth4=true & !(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true)->next(diver_at_depth4=true));
 
+assumption -- alwEv reset_flag=false
+	alwEv(reset_flag=false);
+
+assumption -- always operational below surface
+	alw((depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> operational=true);
+
+assumption -- always operational when max oxygen
+	alw((oxygen6=true) -> operational=true);
 
 guarantee -- submarine_not_moving_in_beginning
-	ini up=false & down=false & rescues1=false & rescues2=false & rescues3=false & rescues4=false & rescues5=false & rescues6=false & rescues7=false & rescues8=false & rescues9=false & rescues10=false & rescues11=false & rescues12=false & rescues13=false & rescues14=false & rescues15=false & rescues16=false & rescues17=false & rescues18=false & rescues19=false & rescues20=false & rescues21=false & rescues22=false & rescues23=false & rescues24=false;
+	ini up=false & down=false & rescues1=false & rescues2=false & rescues3=false & rescues4=false;
 guarantee -- oxygen_false_no_action
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false->up=false & down=false);
+	alw(((oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false) | operational=false)->up=false & down=false);
 guarantee -- cannot_go_up_and_down_at_same_time
 	alw(up=false | down=false);
 guarantee -- rescue1_when_diver_at_depth1_false
@@ -496,3 +506,6 @@ guarantee -- alwEv_rescue_diver_at_depth_3
 	alwEv(rescues3=true);
 guarantee -- alwEv_rescue_diver_at_depth_4
 	alwEv(rescues4=true);
+
+guarantee -- always_oxygen_non_zero_or_depth_zero 
+	alw(!(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false) | (depth0=false & depth1=false & depth2=false & depth3=false & depth4=false));

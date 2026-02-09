@@ -10,14 +10,54 @@ from stable_baselines3.common.monitor import Monitor
 from stable_baselines3.common.vec_env import DummyVecEnv, SubprocVecEnv
 from stable_baselines3.common.evaluation import evaluate_policy
 
+from wrappers.adaptive_shield import AdaptiveShieldWrapper
 from wrappers.seaquest_shields import Naive_Shield, Static_Shield, Repaired_Shield, Adaptive_Shield
 from wrappers.shield import ShieldWrapper
+from spec_repair.config import PROJECT_PATH
 
 from helpers import linear_schedule, EpisodeAccumulator, evaluate_policy, mean_se
 
 import argparse
 
-def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
+PATH_TO_SPEC = os.path.join(PROJECT_PATH, "tests/shield_test/submarine_boolean_64_92.spectra")
+
+ENV_KEYS=[
+    "diver_at_depth1",
+    "diver_at_depth2",
+    "diver_at_depth3",
+    "diver_at_depth4",
+    "reset_flag",
+    "operational",
+    "oxygen0",
+    "oxygen1",
+    "oxygen2",
+    "oxygen3",
+    "oxygen4",
+    "oxygen5",
+    "oxygen6",
+    "depth0",
+    "depth1",
+    "depth2",
+    "depth3",
+    "depth4"
+]
+
+def sys_abstr(action):
+    return {
+        "up": "true" if action in [2,6,7,10,14,15] else "false",
+        "down": "true" if action in [5,8,9,13,16,17] else "false"
+    }
+
+def act_abstr(outputs, varibs, action):
+    if outputs ["up"] == "false" and outputs ["down"] == "false":
+        return 0
+    if outputs["up"] == "true" and outputs ["down"] == "false":
+        return 2
+    if outputs ["up"] == "false" and outputs["down"] == "true":
+        return 5
+    return action 
+
+def make_env(seed=0, max_steps=24000, clip_reward=True, shield_impl="none"):
     """
     Seaquest (expected) -> ShieldWrapper -> Monitor -> (optional) ClipReward
     """
@@ -26,21 +66,28 @@ def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
             repeat=4,
             size=(84,84),
             gray=True,
-            noops=30,
+            noops=0,
             lives='unused', 
             sticky=False,
             initial_oxygen_depletion_rate=1,
             unexpected_violation=False,
             max_episode_steps=max_steps,
         )
+        if shield_impl == "adaptive":
+            #env = Adaptive_Shield(env)
+            env = AdaptiveShieldWrapper(
+                env,
+                PATH_TO_SPEC,
+                env_keys=ENV_KEYS,  # env vars the wrapper expects
+                sys_abstr=sys_abstr,
+                act_abstr=act_abstr,
+            )
         if shield_impl == "naive":
             env = ShieldWrapper(env, Naive_Shield())
         if shield_impl == "static":
             env = ShieldWrapper(env, Static_Shield())
         if shield_impl == "repaired":
             env = ShieldWrapper(env, Repaired_Shield())
-        if shield_impl == "adaptive":
-            env = ShieldWrapper(env, Adaptive_Shield())
         env = Monitor(env, info_keywords=("is_success",))
         if clip_reward:
             env = ClipRewardWrapper(env)
@@ -48,7 +95,7 @@ def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
         return env
     return _init
 
-def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
+def make_eval_env(seed=0, max_steps=24000, shield_impl="none"):
     """
     Seaquest (unexpected) -> ShieldWrapper
     """
@@ -57,21 +104,27 @@ def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
             repeat=4,
             size=(84,84),
             gray=True,
-            noops=30,
+            noops=0,
             lives='unused', 
             sticky=False,
             initial_oxygen_depletion_rate=1,
             unexpected_violation=True,
             max_episode_steps=max_steps,
         )
+        if shield_impl == "adaptive":
+            env = AdaptiveShieldWrapper(
+                env,
+                PATH_TO_SPEC,
+                env_keys=ENV_KEYS,  # env vars the wrapper expects
+                sys_abstr=sys_abstr,
+                act_abstr=act_abstr,
+            )
         if shield_impl == "naive":
             env = ShieldWrapper(env, Naive_Shield())
         if shield_impl == "static":
             env = ShieldWrapper(env, Static_Shield())
         if shield_impl == "repaired":
             env = ShieldWrapper(env, Repaired_Shield())
-        if shield_impl == "adaptive":
-            env = ShieldWrapper(env, Adaptive_Shield())
         env.reset(seed=seed)
         return env
     return _init

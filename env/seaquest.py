@@ -51,7 +51,7 @@ class OxygenWrapper(gym.Wrapper):
             self._flag_1 = False
             self.steps_on_the_surface += 1
             self.steps_below_surface = 0
-            if self.steps_on_the_surface > 0 and (self.steps_on_the_surface % 2) == 0:
+            if self.steps_on_the_surface > 0 and (self.steps_on_the_surface > 5) and (self.steps_on_the_surface % 4) == 0:
                 self.oxygen_level = min(self.oxygen_level + 1, 64) 
                 
         # check if flashing -> if not then don't deplete oxygen
@@ -76,7 +76,7 @@ class OxygenWrapper(gym.Wrapper):
         return obs, reward, terminated, truncated, info
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
-        obs, _ = self.env.reset(seed=seed, options=options)
+        obs, info = self.env.reset(seed=seed, options=options)
         ram = self.env.unwrapped.ale.getRAM()
 
         self.oxygen_level = 0
@@ -92,6 +92,8 @@ class OxygenWrapper(gym.Wrapper):
 
         obs[170:175, 48:48+self.oxygen_level, :] = np.array([214, 214, 214], np.uint8)
         obs[170:175, 112-64+self.oxygen_level:112, :] = np.array([163, 57, 21], np.uint8)
+
+        self.reset_flag = True
         
         return obs
 
@@ -172,6 +174,12 @@ class Seaquest(gym.Env):
         self.action_space = self._env.action_space
         self.observation_space = gym.spaces.Box(low=0, high=255, shape=size + (1 if self._gray else 3,), dtype=np.uint8)
 
+        self.operational = False
+        self.diver_at_depth1 = False
+        self.diver_at_depth2 = False
+        self.diver_at_depth3 = False
+        self.diver_at_depth4 = False
+
         assert self._env.unwrapped.get_action_meanings()[0] == 'NOOP'
         assert self._env.unwrapped.get_action_meanings()[1] == 'FIRE'
 
@@ -183,6 +191,20 @@ class Seaquest(gym.Env):
         self._last_lives = None
         self._action = None
         self._ep_safe = True
+        self._act_dict = {
+                5: 0,
+                8: 3,
+                9: 4,
+                13: 1,
+                16: 11,
+                17: 12,
+                2: 0,
+                6: 3,
+                7: 4,
+                10: 1,
+                14: 11,
+                15: 12,
+        }
 
     def seed(self, seed: int | None = None):
         self.reset(seed=seed)
@@ -198,9 +220,43 @@ class Seaquest(gym.Env):
         info = self._info()
         up = info['_up']
         down = info['_down']
-        curr_depth = info['_depth']
-        prev_depth = info['_depth']
+        operational = info['_operational']
+        curr_depth = int(info['_depth'])
+        prev_depth = int(info['_depth'])
+        oxygen_level = int(info['_oxygen_level'])
         t = self._t
+
+        print(f"depth={curr_depth}, oxygen_level={oxygen_level}, down={down}, operational={operational}")
+
+        if not operational and (up or down):
+            self._action = self._act_dict[self._action]
+
+        if curr_depth == 92 and down:
+            self._action = self._act_dict[self._action]
+
+        if curr_depth == 20 and self.diver_at_depth1:
+            self.diver_at_depth1 = False
+            self.diver_at_depth2 = True
+            self.diver_at_depth3 = True
+            self.diver_at_depth4 = True
+
+        if curr_depth == 44 and self.diver_at_depth2:
+            self.diver_at_depth1 = True
+            self.diver_at_depth2 = False
+            self.diver_at_depth3 = True
+            self.diver_at_depth4 = True
+
+        if curr_depth == 68 and self.diver_at_depth3:
+            self.diver_at_depth1 = True
+            self.diver_at_depth2 = True
+            self.diver_at_depth3 = False
+            self.diver_at_depth4 = True
+
+        if curr_depth == 92 and self.diver_at_depth4:
+            self.diver_at_depth1 = True
+            self.diver_at_depth2 = True
+            self.diver_at_depth3 = True
+            self.diver_at_depth4 = False
 
         for repeat in range(self._repeat):
             ob, reward, over, _, _ = self._env.step(self._action)
@@ -209,16 +265,6 @@ class Seaquest(gym.Env):
             total += reward
             if repeat == self._repeat - 2:
                 self._buffer[1] = np.array(ob, dtype=np.uint8)
-            if up:
-                depth = self._info()['_depth'] 
-                if not (depth < curr_depth or (depth == 0)):
-                    self._env.toggle_flag()
-                curr_depth = depth
-            if down:
-                depth = self._info()['_depth'] 
-                if not (depth > curr_depth or (depth == 95) or (depth==0)):
-                    self._env.toggle_flag()
-                curr_depth = depth
             if over:
                 break
             if self._lives != 'unused':
@@ -229,12 +275,20 @@ class Seaquest(gym.Env):
                     break
 
         info = self._info()
-        depth = info['_depth']
+        depth = int(info['_depth'])
+        oxygen_level = int(info['_oxygen_level'])
+
+        if info["_oxygen_level"] == 64:
+            self.operational = True
+            self.diver_at_depth1 = True
+            self.diver_at_depth2 = True
+            self.diver_at_depth3 = True
+            self.diver_at_depth4 = True
 
         # we might need an operational flag 
         # prevent agent from going down if first down action does not result in depth decrease from depth == 0
-        assert not up or ((prev_depth - depth) == 4) or depth==0 or self._env._flag_1 or over, f"up={up}, curr_depth={prev_depth}, depth={depth}, over={over}, dead={dead}, t={t}, self._t={self._t}, action={self._action}, flag={self._env._flag_1}"
-        assert not down or ((depth - prev_depth) <= 4) or depth==95 or depth==0 or self._env._flag_1 or over, f"down={down}, curr_depth={prev_depth}, depth={depth}, over={over}, dead={dead}, t={t}, self._t={self._t}, action={self._action}, flag={self._env._flag_1}"
+        # assert not up or ((prev_depth - depth) == 4) or depth==0 or over or not operational, f"up={up}, curr_depth={prev_depth}, depth={depth}, over={over}, dead={dead}, t={t}, self._t={self._t}, action={self._action}, operational={operational}"
+        # assert not down or ((depth - prev_depth) == 4) or depth==92 or over or not operational, f"down={down}, curr_depth={prev_depth}, depth={depth}, over={over}, dead={dead}, t={t}, self._t={self._t}, action={self._action}, operational={operational}"
 
         if not self._repeat:
             self._buffer[1][:] = self._buffer[0][:]
@@ -244,13 +298,20 @@ class Seaquest(gym.Env):
         terminated = dead or over
         truncated = (self.max_episode_steps and self._t >= self.max_episode_steps)
 
-        return self._obs(), total, terminated, truncated, self._info()
+        # auto reset on collision with shark or submarine
+        terminated = terminated or not (not up or ((prev_depth - depth) == 4) or depth==0 or over or not operational)\
+            or not (not down or ((depth - prev_depth) == 4) or depth==92 or over or not operational)
+
+        info = self._info()
+        info["reset_flag"] = "false"
+
+        return self._obs(), total, terminated, truncated, info
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
         super().reset(seed=seed)
         if seed is not None:
             self.np_random, _ = gym.utils.seeding.np_random(seed)
-
+        
         self._t = 0
         self._env.reset(seed=seed, options=options)
         self._action = 1
@@ -266,7 +327,14 @@ class Seaquest(gym.Env):
         self._buffer[0] = np.array(ob, dtype=np.uint8)
         self._buffer[1].fill(0)
         self._ep_safe = True
-        return self._obs(), self._info()
+        self.operational = False
+        self.diver_at_depth1 = False
+        self.diver_at_depth2 = False
+        self.diver_at_depth3 = False
+        self.diver_at_depth4 = False
+        info = self._info()
+        info["reset_flag"] = "true"
+        return self._obs(), info
 
     def _obs(self):
         np.maximum(self._buffer[0], self._buffer[1], out=self._buffer[0])
@@ -292,8 +360,11 @@ class Seaquest(gym.Env):
         down = self._action in [5,8,9,13,16,17]
         depth = self._env.depth
         oxygen_level = self._env.oxygen_level
+        operational = self.operational
 
         safe = (oxygen_level > 0) or (depth == 0)
+
+        assert safe, f"depth={depth}, oxygen_level={oxygen_level}"
 
         self._ep_safe = bool(safe * self._ep_safe)
 
@@ -316,15 +387,31 @@ class Seaquest(gym.Env):
             else:
                 in_winning_region = True
 
+        oxygen_bits = [(bool((oxygen_level >> i) & 1)) for i in range(7)]
+        oxygen_encoding = {f"oxygen{i}": "true" if oxygen_bits[i] else "false" for i in range(7)}
+
+        depth_idx = depth // 4
+        depth_bits = [(bool((depth_idx >> i) & 1)) for i in range(5)]
+        depth_encoding = {f"depth{i}": "true" if depth_bits[i] else "false" for i in range(5)}
+
+        diver_encodings = {f"diver_at_depth{i}": "true" if getattr(self, f"diver_at_depth{i}", None) else "false" for i in range(1, 5)}
+
         info = {
             '_up': up,
             '_down': down, 
+            "up": "true" if up else "false",
+            "down": "true" if down else "false",
             '_depth': depth, 
             '_oxygen_level': oxygen_level, 
+            "operational": "true" if operational else "false",
+            '_operational': operational,
             'guarantee_1': safe,
             'in_winning_region': in_winning_region,
             'is_success_1': self._ep_safe,
-            'is_success': self._ep_safe}
+            'is_success': self._ep_safe,
+            **oxygen_encoding,
+            **depth_encoding,
+            **diver_encodings}
         return info
 
 

@@ -86,8 +86,9 @@ class AdaptiveShield:
 
         # Generate the first controller
         first_controller_folder_path = self._get_controller_folder_path()
-        if synthesise_controller(first_spec_path, first_controller_folder_path):
-            print(f"Controller synthesized successfully at {first_controller_folder_path}")
+        res = synthesise_controller(first_spec_path, first_controller_folder_path)
+        if res:
+            print(res)
 
         # Initialize the ControllerShield with the first controller folder path
         self._shield = ControllerShield(first_controller_folder_path)
@@ -97,6 +98,7 @@ class AdaptiveShield:
     def initiate_starting_state(self, state: Optional[Dict[str, str]] = None) -> bool:
         if state is None:
             state = {}
+        print(state)
         return self._shield.initiate_starting_state(state)
 
     def get_safe_action(self, state, action):

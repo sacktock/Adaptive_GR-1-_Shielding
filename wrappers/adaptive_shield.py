@@ -32,9 +32,14 @@ class AdaptiveShieldWrapper(gym.Wrapper):
     def step(self, action):
         # extract the system variables from the desired action
         sys_varibs = self.sys_abstr(action)
+
+        #print("Env varibs:", self._env_varibs)
+        #print("Sys varibs:", sys_varibs)
+
+        #assert "operational" in self._env_varibs.keys()
         
         # shield before action is comitted
-        safe_output = self.shield.get_safe_action(self._env_varibs, sys_varibs)
+        safe_output = self.shield.get_safe_action(self._env_varibs, sys_varibs)  
 
         # extract the safe action from the shield output
         safe_action = self.act_abstr(safe_output, sys_varibs, action)
