@@ -52,19 +52,33 @@ class LTLTokenizer:
                 pos += len(value)
                 continue
 
-            # Special case: split compound prefix ops like GF(... into separate tokens
-            if kind == 'ID' and len(value) > 1 and all(c in "GFX" for c in value):
-                # Lookahead to check if it's followed by LPAREN
+            # Special case: split compound prefix ops like GF, alwEv, etc.
+            if kind == 'ID':
                 remaining = text[pos + len(value):].lstrip()
                 if remaining.startswith("("):
-                    for c in value:
-                        yield Token({
-                                        'G': 'GLOBALLY',
-                                        'F': 'EVENTUALLY',
-                                        'X': 'NEXT'
-                                    }[c], c)
-                    pos += len(value)
-                    continue
+                    prefixes = {
+                        "G": "GLOBALLY",
+                        "F": "EVENTUALLY",
+                        "X": "NEXT",
+                        "alw": "GLOBALLY",
+                        "Ev": "EVENTUALLY",
+                    }
+
+                    i = 0
+                    matched = True
+                    while i < len(value):
+                        for p, t in prefixes.items():
+                            if value.startswith(p, i):
+                                yield Token(t, p)
+                                i += len(p)
+                                break
+                        else:
+                            matched = False
+                            break
+
+                    if matched:
+                        pos += len(value)
+                        continue
 
             yield Token(kind, value)
             pos += len(value)
