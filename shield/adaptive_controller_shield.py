@@ -60,7 +60,7 @@ def run_jvm_module_subprocess(script, input_file, config_file, output_file):
 
 
 class AdaptiveShield:
-    def __init__(self, spec_path: str, initiate_spec_repair: bool = True):
+    def __init__(self, spec_path: str, seed: int, initiate_spec_repair: bool = True):
         """
         Initialize AdaptiveControllerShield by connecting to the Java server
         and sending the folder path for initialization.
@@ -74,10 +74,11 @@ class AdaptiveShield:
 
         parent_folder_path = os.path.dirname(spec_path)
         self._id = 0
+        self._seed = seed
         # Create storage folders for specifications and controllers
-        self._specs_folder_path = os.path.join(parent_folder_path, f'specs')
+        self._specs_folder_path = os.path.join(parent_folder_path, f'specs_{self._seed}')
         os.makedirs(self._specs_folder_path, exist_ok=True)
-        self._controllers_folder_path = os.path.join(parent_folder_path, f'controllers')
+        self._controllers_folder_path = os.path.join(parent_folder_path, f'controllers_{self._seed}')
         os.makedirs(self._controllers_folder_path, exist_ok=True)
 
         # Copy the first specification file to the specs folder
@@ -125,6 +126,10 @@ class AdaptiveShield:
             print("Safe action after spec repair:", safe_action)
         self._trace_log.append((state, {k: v for k, v in safe_action.items() if k in action}))
         return safe_action
+
+    def cleanup(self):
+        shutil.rmtree(self._specs_folder_path, ignore_errors=False, onerror=None)
+        shutil.rmtree(self._controllers_folder_path, ignore_errors=False, onerror=None)
 
     def _get_violation_trace_file(self):
         violation_trace = generate_holds_at_statements(self._trace_log)

@@ -3,18 +3,19 @@ from shield.adaptive_controller_shield import AdaptiveShield
 
 class AdaptiveShieldWrapper(gym.Wrapper):
 
-    def __init__(self, env, path_to_spec, env_keys, sys_abstr, act_abstr):
+    def __init__(self, env, seed, path_to_spec, env_keys, sys_abstr, act_abstr, initiate_spec_repair):
         super().__init__(env)
-
+        self.seed = seed
         self.path_to_spec = path_to_spec
         self.env_keys = env_keys
         self.sys_abstr = sys_abstr
         self.act_abstr = act_abstr
+        self.initiate_spec_repair = initiate_spec_repair
         # environment variables for GR(1)
         self._env_varibs = None
 
     def _init_shield(self, state=None):
-        self.shield = AdaptiveShield(self.path_to_spec, initiate_spec_repair=True)
+        self.shield = AdaptiveShield(self.path_to_spec, self.seed, initiate_spec_repair=self.initiate_spec_repair)
         self.shield.initiate_starting_state(state)
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
@@ -55,6 +56,11 @@ class AdaptiveShieldWrapper(gym.Wrapper):
         self._env_varibs = {k: info[k] for k in self.env_keys if k in info}
 
         return obs, reward, done, truncated, info
+
+    def close(self):
+        if hasattr(self, "shield"):
+            self.shield.cleanup()
+        
         
         
 

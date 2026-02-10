@@ -76,10 +76,12 @@ def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
         if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
+                seed,
                 PATH_TO_SPEC,
                 env_keys=ENV_KEYS,  # env vars the wrapper expects
                 sys_abstr=sys_abstr,
                 act_abstr=act_abstr,
+                initiate_spec_repair=False,
             )
         if shield_impl == "naive":
             env = ShieldWrapper(env, Naive_Shield())
@@ -110,15 +112,17 @@ def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
             sticky=False,
             initial_oxygen_depletion_rate=1,
             unexpected_violation=True,
-            max_episode_steps=max_steps,
+            max_episode_steps=max_steps,   
         )
         if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
+                seed,
                 PATH_TO_SPEC,
                 env_keys=ENV_KEYS,  # env vars the wrapper expects
                 sys_abstr=sys_abstr,
                 act_abstr=act_abstr,
+                initiate_spec_repair=True,
             )
         if shield_impl == "naive":
             env = ShieldWrapper(env, Naive_Shield())

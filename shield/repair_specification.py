@@ -66,9 +66,9 @@ def main():
 
 
 if __name__ == "__main__":
-    run_single_repair(
-        os.path.join(PROJECT_PATH, "tests/shield_test/specs/spec_0.spectra"),
-        os.path.join(PROJECT_PATH, "tests/shield_test/specs/violation_trace_0.txt"),
-        os.path.join(PROJECT_PATH, "tests/shield_test/specs/spec_1.spectra"),
-    )
-    # main()
+    #run_single_repair(
+    #    os.path.join(PROJECT_PATH, "tests/shield_test/specs/spec_0.spectra"),
+    #    os.path.join(PROJECT_PATH, "tests/shield_test/specs/violation_trace_0.txt"),
+    #    os.path.join(PROJECT_PATH, "tests/shield_test/specs/spec_1.spectra"),
+    #)
+    main()

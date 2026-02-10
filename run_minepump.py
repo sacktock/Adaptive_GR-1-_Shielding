@@ -29,10 +29,12 @@ def make_env(seed=0, max_steps=2000, shield_impl="none"):
         if shield_impl == "adaptive":
             env = AdaptiveShieldWrapper(
                 env,
+                seed,
                 PATH_TO_SPEC,
                 env_keys=["highwater", "methane"],  # env vars the wrapper expects
                 sys_abstr=lambda action: {"pump": "true" if action == 1 else "false"},
                 act_abstr=lambda output, varibs, action: 1 if output["pump"] == "true" else 0,
+                initiate_spec_repair=False,
             )
         if shield_impl == "static_1":
             env = ShieldWrapper(env, Static_Shield_1())
@@ -56,10 +58,12 @@ def make_eval_env(seed=0, max_steps=2000, shield_impl="none"):
         if shield_impl == "adaptive":
             env = AdaptiveShieldWrapper(
                 env,
+                seed,
                 PATH_TO_SPEC,
                 env_keys=["highwater", "methane"],  # env vars the wrapper expects
                 sys_abstr=lambda action: {"pump": "true" if action == 1 else "false"},
                 act_abstr=lambda output, varibs, action: 1 if output["pump"] == "true" else 0,
+                initiate_spec_repair=True,
             )
         if shield_impl == "static_1":
             env = ShieldWrapper(env, Static_Shield_1())
