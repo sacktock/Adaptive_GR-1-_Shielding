@@ -26,6 +26,7 @@ class OxygenWrapper(gym.Wrapper):
             self._switching_flag = False
         self.steps_below_surface = None
         self.steps_on_the_surface = None
+        self.faster_rate = False
 
         self._last_lives = None
         self._flag_1 = False
@@ -37,8 +38,8 @@ class OxygenWrapper(gym.Wrapper):
         obs, reward, terminated, truncated, info = self.env.step(action)
         ram = self.env.unwrapped.ale.getRAM()
 
-        self.depth = ram[97] - 13
-        #self.oxygen_depletion_rate = 1
+        prev_depth = self.depth
+        self.depth = int(ram[97]) - 13
 
         # reset the flashing flag after life lost
         current = self.env.unwrapped.ale.lives()
@@ -46,32 +47,36 @@ class OxygenWrapper(gym.Wrapper):
             #assert self._flag_1, f"_flag_1 {self._flag_1}, current {current}, _last_lives {self._last_lives}"
             self._flag_1 = False
             self._last_lives = current
+
+        if (self.depth > 0) or (prev_depth > 0):# and (not self._flag_1) and (not terminated) and (not truncated):
+            self.steps_below_surface += 1
+            self.steps_on_the_surface = 0
+            if self.steps_below_surface > 0 and (self.steps_below_surface % (4 // self.oxygen_depletion_rate)) == 0: 
+                self.oxygen_level = max(self.oxygen_level - 1, 0)
     
         if self.depth == 0:
             self._flag_1 = False
             self.steps_on_the_surface += 1
             self.steps_below_surface = 0
-            if self.steps_on_the_surface > 0 and (self.steps_on_the_surface > 5) and (self.steps_on_the_surface % 4) == 0:
+            if self.steps_on_the_surface > 0 and (self.steps_on_the_surface % 4) == 0 and not self.reset_flag:
+                self.reset_flag = False
                 self.oxygen_level = min(self.oxygen_level + 1, 64) 
-                
+            if self.steps_on_the_surface > 0 and (self.steps_on_the_surface % 4) == 0:
+                self.reset_flag = False
+
         # check if flashing -> if not then don't deplete oxygen
         if np.any(obs == 708):
             self.toggle_flag()
-
-        if self.depth > 0 and (not self._flag_1) and (not terminated) and (not truncated):
-            self.steps_below_surface += 1
-            self.steps_on_the_surface = 0
-            if self.steps_below_surface > 0 and (self.steps_below_surface % (4 // self.oxygen_depletion_rate)) == 0: 
-                self.oxygen_level = max(self.oxygen_level - 1, 0)
-
+                
         obs[170:175, 48:(48+self.oxygen_level), :] = np.array([214, 214, 214], np.uint8)
         obs[170:175, 112-(64-self.oxygen_level):112, :] = np.array([163, 57, 21], np.uint8)
 
-        if not ((self.oxygen_level > 0) or (self.depth == 0)):
+        if not ((self.oxygen_level > 0) or (self.depth == 0)) or self._flag_1:
             terminated = True
 
         if (self._switching_flag) and (self.oxygen_level <= self.switching_oxygen_level) and (self.depth > 0) and (self.oxygen_depletion_rate != self.higher_depletion_rate):
             self.oxygen_depletion_rate = self.higher_depletion_rate
+            self.faster_rate = True
 
         return obs, reward, terminated, truncated, info
 
@@ -86,6 +91,7 @@ class OxygenWrapper(gym.Wrapper):
 
         if self.unexpected_violation:
             self.oxygen_depletion_rate = self.lower_depletion_rate
+            self.faster_rate = False
 
         self._last_lives = self.env.unwrapped.ale.lives()
         self._flag_1 = False
@@ -192,18 +198,7 @@ class Seaquest(gym.Env):
         self._action = None
         self._ep_safe = True
         self._act_dict = {
-                5: 0,
-                8: 3,
-                9: 4,
-                13: 1,
-                16: 11,
-                17: 12,
-                2: 0,
-                6: 3,
-                7: 4,
-                10: 1,
-                14: 11,
-                15: 12,
+            5: 0, 8: 3, 9: 4, 13: 1, 16: 11, 17: 12, 2: 0, 6: 3, 7: 4, 10: 1, 14: 11,15: 12,
         }
 
     def seed(self, seed: int | None = None):
@@ -225,8 +220,6 @@ class Seaquest(gym.Env):
         prev_depth = int(info['_depth'])
         oxygen_level = int(info['_oxygen_level'])
         t = self._t
-
-        #print(f"depth={curr_depth}, oxygen_level={oxygen_level}, down={down}, operational={operational}")
 
         if not operational and (up or down):
             self._action = self._act_dict[self._action]
@@ -278,7 +271,10 @@ class Seaquest(gym.Env):
         depth = int(info['_depth'])
         oxygen_level = int(info['_oxygen_level'])
 
-        if info["_oxygen_level"] == 64:
+        if depth == 0:
+            self.operational = False
+
+        if oxygen_level == 64:
             self.operational = True
             self.diver_at_depth1 = True
             self.diver_at_depth2 = True
@@ -303,7 +299,6 @@ class Seaquest(gym.Env):
             or not (not down or ((depth - prev_depth) == 4) or depth==92 or over or not operational)
 
         info = self._info()
-        info["reset_flag"] = "false"
 
         return self._obs(), total, terminated, truncated, info
 
@@ -333,7 +328,6 @@ class Seaquest(gym.Env):
         self.diver_at_depth3 = False
         self.diver_at_depth4 = False
         info = self._info()
-        info["reset_flag"] = "true"
         return self._obs(), info
 
     def _obs(self):
@@ -361,6 +355,8 @@ class Seaquest(gym.Env):
         depth = self._env.depth
         oxygen_level = self._env.oxygen_level
         operational = self.operational
+        faster_rate = self._env.faster_rate
+        reset_flag = self._env.reset_flag
 
         safe = (oxygen_level > 0) or (depth == 0)
 
@@ -404,6 +400,8 @@ class Seaquest(gym.Env):
             '_depth': depth, 
             '_oxygen_level': oxygen_level, 
             "operational": "true" if operational else "false",
+            "reset_flag": "true" if reset_flag else "false",
+            "faster_rate": "true" if faster_rate else "false",
             '_operational': operational,
             'guarantee_1': safe,
             'in_winning_region': in_winning_region,
