@@ -19,13 +19,14 @@ from helpers import linear_schedule, EpisodeAccumulator, evaluate_policy, mean_s
 
 import argparse
 
-PATH_TO_SPEC = os.path.join(PROJECT_PATH, "tests/shield_test/submarine_boolean_64_92.spectra")
+PATH_TO_SPEC = os.path.join(PROJECT_PATH, "env_specs/seaquest/submarine_boolean_64_92_strong.spectra")
 
 ENV_KEYS=[
     "diver_at_depth1",
     "diver_at_depth2",
     "diver_at_depth3",
     "diver_at_depth4",
+    "faster_rate",
     "reset_flag",
     "operational",
     "oxygen0",
@@ -57,7 +58,7 @@ def act_abstr(outputs, varibs, action):
         return 5
     return action 
 
-def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
+def make_env(seed=0, index=0, max_steps=108000, clip_reward=True, shield_impl="none"):
     """
     Seaquest (expected) -> ShieldWrapper -> Monitor -> (optional) ClipReward
     """
@@ -76,11 +77,12 @@ def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
         if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
-                seed,
+                index,
                 PATH_TO_SPEC,
                 env_keys=ENV_KEYS,  # env vars the wrapper expects
                 sys_abstr=sys_abstr,
                 act_abstr=act_abstr,
+                initiate_synthesis=False,
                 initiate_spec_repair=False,
             )
         if shield_impl == "naive":
@@ -98,7 +100,7 @@ def make_env(seed=0, max_steps=108000, clip_reward=True, shield_impl="none"):
         return env
     return _init
 
-def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
+def make_eval_env(seed=0, index=0, max_steps=108000, shield_impl="none"):
     """
     Seaquest (unexpected) -> ShieldWrapper
     """
@@ -117,12 +119,13 @@ def make_eval_env(seed=0, max_steps=108000, shield_impl="none"):
         if shield_impl == "adaptive-ilasp":
             env = AdaptiveShieldWrapper(
                 env,
-                seed,
+                index,
                 PATH_TO_SPEC,
                 env_keys=ENV_KEYS,  # env vars the wrapper expects
                 sys_abstr=sys_abstr,
                 act_abstr=act_abstr,
-                initiate_spec_repair=True,
+                initiate_synthesis=False,
+                initiate_spec_repair=False,
             )
         if shield_impl == "naive":
             env = ShieldWrapper(env, Naive_Shield())
@@ -151,14 +154,14 @@ def one_run(run_seed: int, n_envs: int, total_timesteps: int, n_eval_episodes: i
         print("No checkpoint found, commencing training ...")
 
         seeds = [run_seed + i for i in range(n_envs)]
-        train_env = SubprocVecEnv([make_env(seed=seed, clip_reward=True, shield_impl=shield_impl) for seed in seeds])
+        train_env = SubprocVecEnv([make_env(seed=seed, index=idx, clip_reward=True, shield_impl=shield_impl) for idx, seed in enumerate(seeds)])
 
         model = PPO(
             policy="CnnPolicy",
             env=train_env,
-            n_steps=128,                 
-            batch_size=256,              
-            n_epochs=3,
+            n_steps=2048,                 
+            batch_size=64,              
+            n_epochs=10,
             gamma=0.99,
             gae_lambda=0.95,
             ent_coef=0.01,
@@ -193,7 +196,7 @@ def one_run(run_seed: int, n_envs: int, total_timesteps: int, n_eval_episodes: i
 
     #eval_env = DummyVecEnv([make_env(seed=seed, clip_reward=False, shield_impl=shield_impl)])
 
-    eval_env = DummyVecEnv([make_eval_env(seed=seed+123, shield_impl=shield_impl)])
+    eval_env = DummyVecEnv([make_eval_env(seed=seed+123, index=0, shield_impl=shield_impl)])
 
     output.update(evaluate_policy(model, eval_env, n_eval_episodes=n_eval_episodes))
 
@@ -207,7 +210,7 @@ if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
     parser.add_argument("-r", "--runs", type=int, default=5)
-    parser.add_argument("-n", "--n-envs", type=int, default=8)
+    parser.add_argument("-n", "--n-envs", type=int, default=1)
     parser.add_argument("-t", "--timesteps", type=int, default=10_000_000)
     parser.add_argument("-e", "--eval", type=int, default=20)
     parser.add_argument("--logdir", type=str, default="./logdir/seaquest")

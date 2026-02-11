@@ -18,9 +18,9 @@ from helpers import EpisodeAccumulator, evaluate_controller, evaluate_policy, me
 
 import argparse
 
-PATH_TO_SPEC = os.path.join(PROJECT_PATH, "tests/shield_test/minepump_strong.spectra")
+PATH_TO_SPEC = os.path.join(PROJECT_PATH, "env_specs/minepump/minepump_strong.spectra")
 
-def make_env(seed=0, max_steps=2000, shield_impl="none"):
+def make_env(seed=0, index=0, max_steps=2000, shield_impl="none"):
     """
     Minepump (expected) -> AdaptiveShield/Shield -> TimeLimit -> FlattenObservation -> Monitor
     """
@@ -29,12 +29,13 @@ def make_env(seed=0, max_steps=2000, shield_impl="none"):
         if shield_impl == "adaptive":
             env = AdaptiveShieldWrapper(
                 env,
-                seed,
+                index,
                 PATH_TO_SPEC,
                 env_keys=["highwater", "methane"],  # env vars the wrapper expects
                 sys_abstr=lambda action: {"pump": "true" if action == 1 else "false"},
                 act_abstr=lambda output, varibs, action: 1 if output["pump"] == "true" else 0,
                 initiate_spec_repair=False,
+                initiate_synthesis=False,
             )
         if shield_impl == "static_1":
             env = ShieldWrapper(env, Static_Shield_1())
@@ -49,7 +50,7 @@ def make_env(seed=0, max_steps=2000, shield_impl="none"):
         return env
     return _init
 
-def make_eval_env(seed=0, max_steps=2000, shield_impl="none"):
+def make_eval_env(seed=0, index=0, max_steps=2000, shield_impl="none"):
     """
     Minepump (unexpected) -> AdaptiveShield/Shield -> TimeLimit -> FlattenObservation
     """
@@ -58,12 +59,13 @@ def make_eval_env(seed=0, max_steps=2000, shield_impl="none"):
         if shield_impl == "adaptive":
             env = AdaptiveShieldWrapper(
                 env,
-                seed,
+                index,
                 PATH_TO_SPEC,
                 env_keys=["highwater", "methane"],  # env vars the wrapper expects
                 sys_abstr=lambda action: {"pump": "true" if action == 1 else "false"},
                 act_abstr=lambda output, varibs, action: 1 if output["pump"] == "true" else 0,
-                initiate_spec_repair=True,
+                initiate_spec_repair=False,
+                initiate_synthesis=False,
             )
         if shield_impl == "static_1":
             env = ShieldWrapper(env, Static_Shield_1())
@@ -91,7 +93,7 @@ def one_run(run_seed: int, total_timesteps: int, n_eval_episodes: int, log_root:
     else:
         print("No checkpoint found, commencing training ...")
 
-        train_env = DummyVecEnv([make_env(seed=run_seed, max_steps=2000, shield_impl=shield_impl)])
+        train_env = DummyVecEnv([make_env(seed=run_seed, index=0, max_steps=2000, shield_impl=shield_impl)])
 
         model = DQN(
             policy="MlpPolicy",
@@ -133,7 +135,7 @@ def one_run(run_seed: int, total_timesteps: int, n_eval_episodes: int, log_root:
 
         train_env.close()
 
-    eval_env = DummyVecEnv([make_eval_env(seed=run_seed+123, max_steps=2000, shield_impl=shield_impl)])
+    eval_env = DummyVecEnv([make_eval_env(seed=run_seed+123, index=0, max_steps=2000, shield_impl=shield_impl)])
 
     output.update(evaluate_policy(model, eval_env, n_eval_episodes=n_eval_episodes))
 
