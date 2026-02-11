@@ -50,13 +50,19 @@ def sys_abstr(action):
     }
 
 def act_abstr(outputs, varibs, action):
-    if outputs ["up"] == "false" and outputs ["down"] == "false":
+    abstr = {
+        "up": "true" if action in [2,6,7,10,14,15] else "false",
+        "down": "true" if action in [5,8,9,13,16,17] else "false"
+    }
+    if (outputs["up"], outputs["down"]) == (abstr["up"], abstr["down"]):
+        return int(action)
+    if outputs ["up"] == "false" and outputs["down"] == "false":
         return 0
     if outputs["up"] == "true" and outputs ["down"] == "false":
         return 2
     if outputs ["up"] == "false" and outputs["down"] == "true":
         return 5
-    return action 
+    return int(action)
 
 def make_env(seed=0, index=0, max_steps=108000, clip_reward=True, shield_impl="none"):
     """
@@ -68,7 +74,7 @@ def make_env(seed=0, index=0, max_steps=108000, clip_reward=True, shield_impl="n
             size=(84,84),
             gray=True,
             noops=0,
-            lives='unused', 
+            lives='reset', 
             sticky=False,
             initial_oxygen_depletion_rate=1,
             unexpected_violation=False,
@@ -110,7 +116,7 @@ def make_eval_env(seed=0, index=0, max_steps=108000, shield_impl="none"):
             size=(84,84),
             gray=True,
             noops=0,
-            lives='unused', 
+            lives='reset', 
             sticky=False,
             initial_oxygen_depletion_rate=1,
             unexpected_violation=True,

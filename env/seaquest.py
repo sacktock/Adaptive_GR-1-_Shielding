@@ -234,22 +234,22 @@ class Seaquest(gym.Env):
             self.diver_at_depth4 = True
 
         if curr_depth == 44 and self.diver_at_depth2:
-            self.diver_at_depth1 = True
             self.diver_at_depth2 = False
+            self.diver_at_depth1 = True
             self.diver_at_depth3 = True
             self.diver_at_depth4 = True
 
         if curr_depth == 68 and self.diver_at_depth3:
+            self.diver_at_depth3 = False
             self.diver_at_depth1 = True
             self.diver_at_depth2 = True
-            self.diver_at_depth3 = False
             self.diver_at_depth4 = True
 
         if curr_depth == 92 and self.diver_at_depth4:
+            self.diver_at_depth4 = False
             self.diver_at_depth1 = True
             self.diver_at_depth2 = True
             self.diver_at_depth3 = True
-            self.diver_at_depth4 = False
 
         for repeat in range(self._repeat):
             ob, reward, over, _, _ = self._env.step(self._action)
@@ -368,17 +368,17 @@ class Seaquest(gym.Env):
             (self._unexpected_violation and \
                 (self._env.oxygen_depletion_rate == self._initial_oxygen_depletion_rate)):
             time_until_surface = math.ceil(depth/4)
-            if oxygen_level < time_until_surface + 1:
+            if oxygen_level < time_until_surface:
                 in_winning_region = False
-            elif oxygen_level <= time_until_surface + 5:
+            elif oxygen_level <= time_until_surface + 4:
                 in_winning_region = up
             else:
                 in_winning_region = True
         else:
             time_until_surface = math.ceil(depth/4)
-            if oxygen_level//2 < time_until_surface + 1:
+            if math.ceil(oxygen_level/2) < time_until_surface:
                 in_winning_region = False
-            elif oxygen_level//2 <= time_until_surface + 5:
+            elif math.ceil(oxygen_level/2) <= time_until_surface + 4:
                 in_winning_region = up
             else:
                 in_winning_region = True

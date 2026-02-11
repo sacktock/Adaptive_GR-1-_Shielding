@@ -46,7 +46,7 @@ class Static_Shield():
     def __call__(self, action):
         time_until_surface = math.ceil(self.depth/4)
 
-        if self.oxygen_level <= time_until_surface + 5:
+        if self.oxygen_level <= time_until_surface + 4:
             if action in [2,6,7,10,14,15]:
                 return action, False
             else:
@@ -82,7 +82,7 @@ class Repaired_Shield():
     def __call__(self, action):
         time_until_surface = math.ceil(self.depth/4)
 
-        if self.oxygen_level//2 <= time_until_surface + 5:
+        if math.ceil(self.oxygen_level/2) <= time_until_surface + 4:
             if action in [2,6,7,10,14,15]:
                 return action, False
             else:

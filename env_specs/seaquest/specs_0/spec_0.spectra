@@ -594,12 +594,8 @@ assumption -- going_down_increases_depth_from_21_to_22
 	alw(depth0=true & depth1=false & depth2=true & depth3=false & depth4=true & down=true -> next(depth0=false & depth1=true & depth2=true & depth3=false & depth4=true));
 assumption -- going_down_increases_depth_from_22_to_23
 	alw(depth0=false & depth1=true & depth2=true & depth3=false & depth4=true & down=true -> next(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true));
-assumption -- going_down_increases_depth_from_23_to_24
-	alw(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true & down=true -> next(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true));
 assumption -- going_down_at_max_depth_stays_at_max_depth
-	alw(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true & down=true -> next(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true));
-assumption -- going_up_decreases_depth_from_24_to_23
-	alw(depth0=false & depth1=false & depth2=false & depth3=true & depth4=true & up=true -> next(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true));
+	alw(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true & down=true -> next(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true));
 assumption -- going_up_decreases_depth_from_23_to_22
 	alw(depth0=true & depth1=true & depth2=true & depth3=false & depth4=true & up=true -> next(depth0=false & depth1=true & depth2=true & depth3=false & depth4=true));
 assumption -- going_up_decreases_depth_from_22_to_21
