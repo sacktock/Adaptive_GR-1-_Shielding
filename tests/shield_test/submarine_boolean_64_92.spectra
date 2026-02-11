@@ -7,6 +7,7 @@ sys boolean rescues2;
 sys boolean rescues3;
 sys boolean rescues4;
 env boolean operational;
+env boolean faster_rate;
 env boolean reset_flag;
 env boolean diver_at_depth1;
 env boolean diver_at_depth2;
@@ -26,7 +27,7 @@ env boolean depth3;
 env boolean depth4;
 
 assumption -- surface_start
-	ini operational=false & reset_flag=true & diver_at_depth1=false & diver_at_depth2=false & diver_at_depth3=false & diver_at_depth4=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false;
+	ini faster_rate=false & operational=false & reset_flag=true & diver_at_depth1=false & diver_at_depth2=false & diver_at_depth3=false & diver_at_depth4=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false;
 assumption -- oxygen_does_not_increase_at_surface_after_reset
 	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & reset_flag=true -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
 assumption -- oxygen_increases_at_surface_from_0_to_1
@@ -159,136 +160,393 @@ assumption -- oxygen_increases_at_surface_from_63_to_64
 	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true));
 assumption -- max_oxygen_at_surface_stays_max
 	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & down=false -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true));
+
 assumption -- oxygen_decreases_from_64_to_63_on_down
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & down=true -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & down=true -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_63_to_62
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_62_to_61
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_61_to_60
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_60_to_59
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_59_to_58
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_58_to_57
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_57_to_56
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_56_to_55
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_55_to_54
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_54_to_53
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_53_to_52
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_52_to_51
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_51_to_50
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_50_to_49
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_49_to_48
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_48_to_47
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_47_to_46
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_46_to_45
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_45_to_44
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_44_to_43
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_43_to_42
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_42_to_41
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_41_to_40
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_40_to_39
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_39_to_38
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_38_to_37
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_37_to_36
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_36_to_35
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_35_to_34
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_34_to_33
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_33_to_32
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_32_to_31
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_31_to_30
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_30_to_29
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_29_to_28
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_28_to_27
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_27_to_26
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_26_to_25
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_25_to_24
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_24_to_23
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_23_to_22
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_22_to_21
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_21_to_20
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_20_to_19
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_19_to_18
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_18_to_17
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_17_to_16
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_16_to_15
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_15_to_14
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_14_to_13
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_13_to_12
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_12_to_11
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_11_to_10
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_10_to_9
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_9_to_8
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_8_to_7
-	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_7_to_6
-	alw(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_6_to_5
-	alw(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_5_to_4
-	alw(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_4_to_3
-	alw(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_3_to_2
-	alw(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_2_to_1
-	alw(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- oxygen_decreases_at_depth_from_1_to_0
-	alw(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+	alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
 assumption -- min_oxygen_at_depth_stays_min
 	alw(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_from_64_to_62_by2_on_down
+	alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & down=true -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_63_to_61_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_62_to_60_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_61_to_59_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_60_to_58_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_59_to_57_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_58_to_56_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_57_to_55_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_56_to_54_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_55_to_53_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_54_to_52_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_53_to_51_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_52_to_50_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_51_to_49_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_50_to_48_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_49_to_47_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_48_to_46_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_47_to_45_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_46_to_44_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_45_to_43_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_44_to_42_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_43_to_41_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_42_to_40_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_41_to_39_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_40_to_38_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_39_to_37_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_38_to_36_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_37_to_35_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_36_to_34_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_35_to_33_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_34_to_32_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_33_to_31_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_32_to_30_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_31_to_29_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_30_to_28_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_29_to_27_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_28_to_26_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_27_to_25_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_26_to_24_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_25_to_23_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_24_to_22_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_23_to_21_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_22_to_20_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_21_to_19_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_20_to_18_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_19_to_17_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_18_to_16_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_17_to_15_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_16_to_14_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_15_to_13_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_14_to_12_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_13_to_11_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_12_to_10_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_11_to_9_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_10_to_8_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_9_to_7_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_8_to_6_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_7_to_5_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_6_to_4_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_5_to_3_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_4_to_2_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_3_to_1_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_2_to_0_by2
+        alw(faster_rate=true & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
+
+assumption -- oxygen_decreases_at_depth_from_1_to_0_by2
+        alw(faster_rate=true & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false));
 
 assumption -- going_down_increases_depth_from_0_to_1
 	alw(depth0=false & depth1=false & depth2=false & depth3=false & depth4=false & down=true -> next(depth0=true & depth1=false & depth2=false & depth3=false & depth4=false));
@@ -474,6 +732,9 @@ assumption -- always operational below surface
 
 assumption -- always operational when max oxygen
 	alw((oxygen6=true) -> operational=true);
+
+assumption -- always faster rate after trigger
+	alw(faster_rate=false);
 
 guarantee -- submarine_not_moving_in_beginning
 	ini up=false & down=false & rescues1=false & rescues2=false & rescues3=false & rescues4=false;
