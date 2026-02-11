@@ -3,19 +3,20 @@ from shield.adaptive_controller_shield import AdaptiveShield
 
 class AdaptiveShieldWrapper(gym.Wrapper):
 
-    def __init__(self, env, seed, path_to_spec, env_keys, sys_abstr, act_abstr, initiate_spec_repair):
+    def __init__(self, env, index, path_to_spec, env_keys, sys_abstr, act_abstr, initiate_synthesis, initiate_spec_repair):
         super().__init__(env)
-        self.seed = seed
+        self.index = index
         self.path_to_spec = path_to_spec
         self.env_keys = env_keys
         self.sys_abstr = sys_abstr
         self.act_abstr = act_abstr
+        self.initiate_synthesis = initiate_synthesis
         self.initiate_spec_repair = initiate_spec_repair
         # environment variables for GR(1)
         self._env_varibs = None
 
     def _init_shield(self, state=None):
-        self.shield = AdaptiveShield(self.path_to_spec, self.seed, initiate_spec_repair=self.initiate_spec_repair)
+        self.shield = AdaptiveShield(self.path_to_spec, self.index, initiate_synthesis=self.initiate_synthesis, initiate_spec_repair=self.initiate_spec_repair)
         self.shield.initiate_starting_state(state)
 
     def reset(self, *, seed: int | None = None, options: dict | None = None):
@@ -34,8 +35,8 @@ class AdaptiveShieldWrapper(gym.Wrapper):
         # extract the system variables from the desired action
         sys_varibs = self.sys_abstr(action)
 
-        #print("Env varibs:", self._env_varibs)
-        #print("Sys varibs:", sys_varibs)
+        # print("Env varibs:", self._env_varibs)
+        # print("Sys varibs:", sys_varibs)
 
         #assert "operational" in self._env_varibs.keys()
         
@@ -58,8 +59,9 @@ class AdaptiveShieldWrapper(gym.Wrapper):
         return obs, reward, done, truncated, info
 
     def close(self):
-        if hasattr(self, "shield"):
-            self.shield.cleanup()
+        pass
+        #if hasattr(self, "shield"):
+        #    self.shield.cleanup()
         
         
         

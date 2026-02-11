@@ -60,7 +60,7 @@ def run_jvm_module_subprocess(script, input_file, config_file, output_file):
 
 
 class AdaptiveShield:
-    def __init__(self, spec_path: str, seed: int, initiate_spec_repair: bool = True):
+    def __init__(self, spec_path: str, index: int, initiate_synthesis: bool = False, initiate_spec_repair: bool = True):
         """
         Initialize AdaptiveControllerShield by connecting to the Java server
         and sending the folder path for initialization.
@@ -70,15 +70,16 @@ class AdaptiveShield:
         if not os.path.exists(spec_path):
             raise FileNotFoundError(f"Specification file not found at path: {spec_path}")
 
+        self.initiate_synthesis = initiate_synthesis
         self.initiate_spec_repair = initiate_spec_repair
 
         parent_folder_path = os.path.dirname(spec_path)
         self._id = 0
-        self._seed = seed
+        self._index = index
         # Create storage folders for specifications and controllers
-        self._specs_folder_path = os.path.join(parent_folder_path, f'specs_{self._seed}')
+        self._specs_folder_path = os.path.join(parent_folder_path, f'specs_{self._index}')
         os.makedirs(self._specs_folder_path, exist_ok=True)
-        self._controllers_folder_path = os.path.join(parent_folder_path, f'controllers_{self._seed}')
+        self._controllers_folder_path = os.path.join(parent_folder_path, f'controllers_{self._index}')
         os.makedirs(self._controllers_folder_path, exist_ok=True)
 
         # Copy the first specification file to the specs folder
@@ -87,9 +88,10 @@ class AdaptiveShield:
 
         # Generate the first controller
         first_controller_folder_path = self._get_controller_folder_path()
-        res = synthesise_controller(first_spec_path, first_controller_folder_path)
-        if res:
-            print(res)
+        if self.initiate_synthesis:
+            res = synthesise_controller(first_spec_path, first_controller_folder_path)
+            if res:
+                print(res)
 
         # Initialize the ControllerShield with the first controller folder path
         self._shield = ControllerShield(first_controller_folder_path)
@@ -117,13 +119,18 @@ class AdaptiveShield:
                                           self._get_spec_path(), self._get_violation_trace_file(),
                                           self._get_next_spec_path())
             new_controller_folder_path = self._get_next_controller_folder_path()
+            # raise RuntimeError("Should not need to repair")
             if self.initiate_spec_repair:
                 self._id += 1
-            synthesise_controller(self._get_next_spec_path(), new_controller_folder_path)
+            if self.initiate_synthesis:
+                res = synthesise_controller(self._get_next_spec_path(), new_controller_folder_path)
+                if res:
+                    print(res)
             self._shield = ControllerShield(new_controller_folder_path)
             self._update_shield_with_trace()
             safe_action: Dict[str, str] = self._shield.get_safe_action(state, action)
             print("Safe action after spec repair:", safe_action)
+            
         self._trace_log.append((state, {k: v for k, v in safe_action.items() if k in action}))
         return safe_action
 
