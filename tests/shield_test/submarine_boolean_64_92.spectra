@@ -733,8 +733,206 @@ assumption -- always operational below surface
 assumption -- always operational when max oxygen
 	alw((oxygen6=true) -> operational=true);
 
+assumption -- faster_rate never triggers at the surface
+	alw(faster_rate=false & depth0=false & depth1=false & depth2=false & depth3=false & depth4=false -> next(faster_rate=false));
+
 assumption -- always faster rate after trigger
-	alw(faster_rate=false);
+	alw(faster_rate=true -> next(faster_rate=true));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_64
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=true & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_63
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_62
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_61
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_60
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_59
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_58
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_57
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_56
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_55
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_54
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_53
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_52
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_51
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_50
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_49
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_48
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_47
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_46
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_45
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_44
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_43
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_42
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_41
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_40
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_39
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_38
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_37
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_36
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_35
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_34
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_33
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_32
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_31
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_30
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_29
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_28
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_27
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_26
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_25
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_24
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_23
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_22
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_21
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_20
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_19
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_18
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_17
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_16
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_15
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_14
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_13
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_12
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_11
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_10
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_9
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_8
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=true & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_7
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_6
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_5
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_4
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=true & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_3
+        alw(faster_rate=false & oxygen0=true & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_2
+        alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_1
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+
+assumption -- keep_faster_rate_false_at_oxygen_level_0
+        alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
 
 guarantee -- submarine_not_moving_in_beginning
 	ini up=false & down=false & rescues1=false & rescues2=false & rescues3=false & rescues4=false;
