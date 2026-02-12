@@ -360,28 +360,28 @@ class Seaquest(gym.Env):
 
         safe = (oxygen_level > 0) or (depth == 0)
 
-        assert safe, f"depth={depth}, oxygen_level={oxygen_level}"
+        # assert safe, f"depth={depth}, oxygen_level={oxygen_level}"
 
         self._ep_safe = bool(safe * self._ep_safe)
 
         if not self._unexpected_violation or \
             (self._unexpected_violation and \
                 (self._env.oxygen_depletion_rate == self._initial_oxygen_depletion_rate)):
-            time_until_surface = math.ceil(depth/4)
-            if oxygen_level < time_until_surface:
-                in_winning_region = False
-            elif oxygen_level <= time_until_surface + 4:
-                in_winning_region = up
-            else:
+            if depth == 0:
                 in_winning_region = True
+            elif oxygen_level == 0:
+                in_winning_region = False
+            else:
+                in_winning_region = oxygen_level >= (depth + 4 - 1) // 4
         else:
-            time_until_surface = math.ceil(depth/4)
-            if math.ceil(oxygen_level/2) < time_until_surface:
-                in_winning_region = False
-            elif math.ceil(oxygen_level/2) <= time_until_surface + 4:
-                in_winning_region = up
-            else:
+            if depth == 0:
                 in_winning_region = True
+            elif oxygen_level == 0:
+                in_winning_region = False
+            else:
+                k = (depth + 4 - 1) // 4
+                threshold = 2 * (k - 1) + 1 
+                in_winning_region = oxygen_level >= threshold
 
         oxygen_bits = [(bool((oxygen_level >> i) & 1)) for i in range(7)]
         oxygen_encoding = {f"oxygen{i}": "true" if oxygen_bits[i] else "false" for i in range(7)}

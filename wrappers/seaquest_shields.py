@@ -11,7 +11,7 @@ class Naive_Shield():
         self.np_random = None
 
     def __call__(self, action):
-        if self.oxygen_level <= 25 + 4:
+        if self.oxygen_level <= 23:
             if action in [2,6,7,10,14,15]:
                 return action, False
             else:
@@ -44,9 +44,26 @@ class Static_Shield():
         self.np_random = None
 
     def __call__(self, action):
-        time_until_surface = math.ceil(self.depth/4)
 
-        if self.oxygen_level <= time_until_surface + 4:
+        oxygen_next = self.oxygen_level - 1
+
+        up_depth_next = max(self.depth - 4, 0)
+        stay_depth_next = self.depth
+        down_depth_next = self.depth + 4
+
+        winning_with_up = oxygen_next >= (up_depth_next + 4 - 1) // 4
+        winning_with_stay = oxygen_next >= (stay_depth_next + 4 - 1) // 4
+        winning_with_down = oxygen_next >= (down_depth_next + 4 - 1) // 4
+
+        if winning_with_down:
+            return action, False
+        elif winning_with_stay:
+            if action in [5,8,9,13,16,17]:
+                action = self.np_random.choice([0,1,2,3,4,6,7,10,11,12,14,15])
+                return action, True
+            else:
+                return action, False
+        else:
             if action in [2,6,7,10,14,15]:
                 return action, False
             else:
@@ -80,9 +97,29 @@ class Repaired_Shield():
         self.np_random = None
 
     def __call__(self, action):
-        time_until_surface = math.ceil(self.depth/4)
 
-        if math.ceil(self.oxygen_level/2) <= time_until_surface + 4:
+        oxygen_next = self.oxygen_level - 2
+
+        up_depth_next = max(self.depth - 4, 0)
+        stay_depth_next = self.depth
+        down_depth_next = self.depth + 4
+        k1 = (up_depth_next + 4 - 1) // 4
+        k2 = (stay_depth_next + 4 - 1) // 4
+        k3 = (down_depth_next + 4 - 1) // 4
+
+        winning_with_up = oxygen_next >= 2 * (k1 - 1) + 1
+        winning_with_stay = oxygen_next >= 2 * (k2 - 1) + 1
+        winning_with_down = oxygen_next >= 2 * (k3 - 1) + 1
+
+        if winning_with_down:
+            return action, False
+        elif winning_with_stay:
+            if action in [5,8,9,13,16,17]:
+                action = self.np_random.choice([0,1,2,3,4,6,7,10,11,12,14,15])
+                return action, True
+            else:
+                return action, False
+        else:
             if action in [2,6,7,10,14,15]:
                 return action, False
             else:
