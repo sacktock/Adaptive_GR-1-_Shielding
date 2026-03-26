@@ -781,7 +781,7 @@ assumption -- keep_faster_rate_false_at_oxygen_level_50
         alw(faster_rate=false & oxygen0=false & oxygen1=true & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
 
 assumption -- keep_faster_rate_false_at_oxygen_level_49
-        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
+        alw(faster_rate=false & oxygen0=true & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false | faster_rate=true));
 
 assumption -- keep_faster_rate_false_at_oxygen_level_48
         alw(faster_rate=false & oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=true & oxygen5=true & oxygen6=false & (depth0=true | depth1=true | depth2=true | depth3=true | depth4=true) -> next(faster_rate=false));
@@ -957,10 +957,6 @@ guarantee -- alwEv_rescue_diver_at_depth_1
 	alwEv(rescues1=true);
 guarantee -- alwEv_rescue_diver_at_depth_2
 	alwEv(rescues2=true);
-guarantee -- alwEv_rescue_diver_at_depth_3
-	alwEv(rescues3=true);
-guarantee -- alwEv_rescue_diver_at_depth_4
-	alwEv(rescues4=true);
 
 guarantee -- always_oxygen_non_zero_or_depth_zero 
 	alw(!(oxygen0=false & oxygen1=false & oxygen2=false & oxygen3=false & oxygen4=false & oxygen5=false & oxygen6=false) | (depth0=false & depth1=false & depth2=false & depth3=false & depth4=false));
