@@ -90,10 +90,11 @@ dependencies:
       - jpype1==1.6.0
       - modulegraph==0.19.6
       - numpy==2.2.6
-      - pandas==2.3.2
+      - pandas==2.3.2s
       - py-ltl==0.1.0
       - python-dateutil==2.9.0.post0
       - pytz==2025.2
       - six==1.17.0
       - tzdata==2025.2
+      - MASA-Safe-RL>=0.3.3
 prefix: /home/sacktock/anaconda3/envs/gr1_shield

@@ -134,6 +134,7 @@ class Seaquest(gym.Env):
         sticky: bool = False,
         actions: str = 'all', 
         resize: str = 'opencv', 
+        transpose_obs: bool = False,
         initial_oxygen_depletion_rate: int = 1,
         unexpected_violation: bool = False,
         # Control episode length here if desired (otherwise wrap with TimeLimit)
@@ -156,6 +157,7 @@ class Seaquest(gym.Env):
         )
 
         self._resize = resize
+        self._transpose_obs = transpose_obs
         if self._resize == 'opencv':
             import cv2
             self._cv2 = cv2
@@ -178,7 +180,11 @@ class Seaquest(gym.Env):
 
         # Act/Obs space
         self.action_space = self._env.action_space
-        self.observation_space = gym.spaces.Box(low=0, high=255, shape=size + (1 if self._gray else 3,), dtype=np.uint8)
+        if self._transpose_obs:
+            self.observation_space = gym.spaces.Box(low=0, high=255, shape=(1 if self._gray else 3,) + size, dtype=np.uint8)
+        else:
+            self.observation_space = gym.spaces.Box(low=0, high=255, shape=size + (1 if self._gray else 3,), dtype=np.uint8)
+        
 
         self.operational = False
         self.diver_at_depth1 = False
@@ -345,7 +351,9 @@ class Seaquest(gym.Env):
             weights = [0.299, 0.587, 1 - (0.299 + 0.587)]
             image = np.tensordot(image, weights, (-1, 0)).astype(image.dtype)
             image = image[:, :, None]
-
+        if self._transpose_obs:
+            shape = (1 if self._gray else 3,) + self._size
+            image = image.reshape(*shape)
         return image
 
     def _info(self):
@@ -410,6 +418,8 @@ class Seaquest(gym.Env):
             **oxygen_encoding,
             **depth_encoding,
             **diver_encodings}
+
+        info["labels"] = {"safe"} if safe else set()
         return info
 
 
