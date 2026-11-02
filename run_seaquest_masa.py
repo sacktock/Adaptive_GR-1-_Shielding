@@ -141,15 +141,40 @@ def one_run(run_seed: int, total_timesteps: int, n_eval_episodes: int, log_root:
         "env_fn": make_eval_env,
     }
 
-    algo_kwargs = {
-        "policy_kwargs": {
-            "features_extractor_class": NatureCNN,
-            "features_extractor_kwargs": {
-                "grayscale_obs": True,
-                "normalize_images": True,
-            } 
+    if algo == "CPO":
+        algo_kwargs = {
+            "n_steps": 20_000,
+            "learning_rate": 1e-4,
+            "gae_lambda": 0.9,
+            "n_critic_updates": 20,
+            "fvp_sample_freq": 4,
+            "cost_limit": 1.0,
+            "policy_kwargs": {
+                "features_extractor_class": NatureCNN,
+                "features_extractor_kwargs": {
+                    "grayscale_obs": True,
+                    "normalize_images": True,
+                } 
+            }
         }
-    }
+
+    if algo == "PPOLag":
+        algo_kwargs = {
+            "n_steps": 20_000,
+            "learning_rate": 1e-4,
+            "batch_size": 256,
+            "n_epochs": 40,
+            "lagrangian_multiplier_init": 10.0,
+            "lambda_lr": 0.1,
+            "cost_limit": 1.0,
+            "policy_kwargs": {
+                "features_extractor_class": NatureCNN,
+                "features_extractor_kwargs": {
+                    "grayscale_obs": True,
+                    "normalize_images": True,
+                } 
+            }
+        }
 
     model = algo_cls(train_env, **base_kwargs, **algo_kwargs)
 
