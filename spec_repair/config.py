@@ -1,13 +1,22 @@
-import os.path
+import os
 
-PATH_TO_CLI = os.path.expanduser("~/SpectraTools/spectra-cli.jar")
-PATH_TO_CORES = os.path.expanduser("~/SpectraTools/spectra_unrealizable_cores.jar")
-PATH_TO_ALL_CORES = os.path.expanduser("~Spectra/Tools/spectra_all_unrealisable_cores.jar")
-PATH_TO_TOOLBOX = os.path.expanduser("~/SpectraTools/spectra_toolbox.jar")
-PATH_TO_EXECUTOR = os.path.expanduser("~/SpectraTools/spectra-executor.jar")
-PATH_TO_JVM = "/usr/lib/jvm/temurin-23-jdk-amd64/lib/server/libjvm.so"
-PATH_TO_ILASP = os.path.expanduser('~/bin/ILASP')
-PATH_TO_FASTLAS = os.path.expanduser('~/bin/FastLAS')
+
+def _path_from_env(name: str, default: str) -> str:
+    value = os.environ.get(name)
+    if value:
+        return os.path.expanduser(value)
+    return os.path.expanduser(default)
+
+
+PATH_TO_CLI = _path_from_env("GR1_SPECTRA_CLI", "~/SpectraTools/spectra-cli.jar")
+PATH_TO_TOOLBOX = _path_from_env("GR1_SPECTRA_TOOLBOX", "~/SpectraTools/spectra_toolbox.jar")
+PATH_TO_EXECUTOR = _path_from_env("GR1_SPECTRA_EXECUTOR", "~/SpectraTools/spectra-executor.jar")
+PATH_TO_JVM = _path_from_env(
+    "GR1_JVM_PATH",
+    "/usr/lib/jvm/temurin-23-jdk-amd64/lib/server/libjvm.so",
+)
+PATH_TO_ILASP = _path_from_env("GR1_ILASP", "~/bin/ILASP")
+PATH_TO_FASTLAS = _path_from_env("GR1_FASTLAS", "~/bin/FastLAS")
 PRINT_CS = False
 FASTLAS = False  # TODO: modify into enum (inductive ASP tool)
 RESTORE_FIRST_HYPOTHESIS = True
@@ -22,15 +31,11 @@ SETUP_DICT = {'wsl': False,
               'java': 'java',
               }
 
-# TODO - update this to your use home directory
-USER_PATH = 'path_to_user'
-
-# TODO - update this to your project path
-PROJECT_PATH: str = os.path.expanduser("path_to_project")
+PROJECT_PATH: str = _path_from_env(
+    "GR1_PROJECT_PATH",
+    "/mnt/c/Users/alexw/OneDrive/Imperial/Projects/Adaptive-GR(1)-Shielding",
+)
 GENERATE_MULTIPLE_TRACES = False
-
-# Violation Listening Configurations
-LOG_FOLDER = f'{USER_PATH}/eclipse-workspace/logs'
 
 # TODO: add these in a config class
 MAX_ASP_HYPOTHESES = 10

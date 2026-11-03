@@ -1,12 +1,15 @@
-altgraph==0.17.4
-jpype1 @ file:///home/conda/feedstock_root/build_artifacts/jpype1_1738063513548/work
-modulegraph==0.19.6
-numpy==2.2.6
-packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1745345660/work
-pandas==2.3.2
-py_ltl==0.1.0
-python-dateutil==2.9.0.post0
-pytz==2025.2
-six==1.17.0
-tzdata==2025.2
-MASA-Safe-RL>=0.3.3
+# MASA-Safe-RL 0.3.13 requires Python >=3.12.
+--extra-index-url https://test.pypi.org/simple
+
+MASA-Safe-RL==0.3.13
+gymnasium>=1.0
+numpy>=1.26
+pandas>=2.2
+torch>=2.2
+stable-baselines3>=2.4
+ale-py>=0.9
+jax>=0.4.30
+tensorboard>=2.17
+tensorflow>=2.16
+JPype1>=1.5
+py-ltl>=0.1.0

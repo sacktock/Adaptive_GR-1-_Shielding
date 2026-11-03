@@ -25,7 +25,7 @@ import atexit
 from jpype.types import *
 
 if not jpype.isJVMStarted():
-    jpype.startJVM(PATH_TO_JVM, "-ea", classpath=[f"{PATH_TO_TOOLBOX}:{PATH_TO_CLI}"])
+    jpype.startJVM(PATH_TO_JVM, "-ea", classpath=[f"{PATH_TO_TOOLBOX}{os.pathsep}{PATH_TO_CLI}"])
     print("JVM started successfully")
 
 SpectraToolbox = jpype.JClass('cores.SpectraToolbox')
