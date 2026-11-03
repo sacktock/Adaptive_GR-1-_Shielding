@@ -14,3 +14,5 @@ annex*
 spec_repair.log
 logs/
 logdir0/
+*.log
+*.venv
